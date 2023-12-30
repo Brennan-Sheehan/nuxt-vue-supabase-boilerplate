@@ -22,8 +22,8 @@ const downloadImage = async () => {
   }
 };
 
-const uploadAvatar = async (evt) => {
-  files.value = evt.target.files;
+const uploadAvatar = async () => {
+  console.log(files.value);
   try {
     uploading.value = true;
 
@@ -31,8 +31,10 @@ const uploadAvatar = async (evt) => {
       throw new Error("You must select an image to upload.");
     }
 
-    const file = files.value[0];
+    const file = files.value;
+    console.log(file);
     const fileExt = file.name.split(".").pop();
+    console.log(fileExt);
     const fileName = `${Math.random()}.${fileExt}`;
     const filePath = `${fileName}`;
 
@@ -61,13 +63,14 @@ watch(path, () => {
 </script>
 
 <template>
-  <div>
-    <img
+  <div class="avatar-container">
+    <BAvatar
+      variant="dark"
+      icon-variant="warning"
       v-if="src"
       :src="src"
-      alt="Avatar"
-      class="avatar image"
-      style="width: 10em; height: 10em"
+      class="avatar"
+      size="10rem"
     />
     <div
       v-else
@@ -75,45 +78,32 @@ watch(path, () => {
       :style="{ height: size, width: size }"
     />
 
-    <div style="width: 10em; position: relative">
-      <label class="button primary block" for="single">
-        {{ uploading ? "Uploading ..." : "Upload" }}
-      </label>
-      <input
-        style="position: absolute; visibility: hidden"
-        type="file"
-        id="single"
-        accept="image/*"
-        @change="uploadAvatar"
-        :disabled="uploading"
-      />
+    <div class="avatar-upload">
+      <BFormFile v-model="files" accept="image/*" />
+
+      <BButton
+        class="button block"
+        variant="outline-primary"
+        @click="uploadAvatar"
+        >Upload
+      </BButton>
     </div>
   </div>
 </template>
 
 <style scoped>
-label {
-  display: block;
-  margin: 5px 0;
-  color: var(--custom-color-secondary);
-  font-size: 0.8rem;
-  text-transform: uppercase;
+.avatar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
 }
 
-input {
-  width: 100%;
-  border-radius: 5px;
-  border: var(--custom-border);
-  padding: 8px;
-  font-size: 0.9rem;
-  background-color: var(--custom-bg-color);
-  color: var(--custom-color);
+.avatar-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
-
-input[disabled] {
-  color: var(--custom-color-secondary);
-}
-
 .avatar {
   border-radius: var(--custom-border-radius);
   overflow: hidden;

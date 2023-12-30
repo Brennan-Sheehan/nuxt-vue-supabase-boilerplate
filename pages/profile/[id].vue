@@ -64,10 +64,6 @@ async function signOut() {
 <template>
   <div class="container">
     <div class="profile">
-      <div class="info">
-        <h1>{{ username }}</h1>
-        <p>{{ website }}</p>
-      </div>
       <form class="form-widget" @submit.prevent="updateProfile">
         <div class="avatar">
           <Avatar
@@ -78,30 +74,47 @@ async function signOut() {
         </div>
         <div class="form-element">
           <label for="email">Email</label>
-          <input id="email" type="text" :value="user.email" disabled />
+          <BFormInput
+            v-model="user.email"
+            placeholder="Enter your email"
+            type="email"
+          />
         </div>
         <div class="form-element">
           <label for="username">Username</label>
-          <input id="username" type="text" v-model="username" />
+          <BFormInput
+            v-model="username"
+            placeholder="Enter your username"
+            type="text"
+          />
         </div>
         <div class="form-element">
           <label for="website">Website</label>
-          <input id="website" type="url" v-model="website" />
+          <BFormInput
+            v-model="website"
+            placeholder="Enter your website"
+            type="url"
+          />
         </div>
         <div class="button-container">
           <div>
-            <input
-              type="submit"
-              class="button primary block"
-              :value="loading ? 'Loading ...' : 'Update'"
+            <BButton
+              class="button block"
+              variant="outline-primary"
+              @click="updateProfile"
               :disabled="loading"
-            />
+              >Update</BButton
+            >
           </div>
 
           <div>
-            <button class="button block" @click="signOut" :disabled="loading">
-              Sign Out
-            </button>
+            <BButton
+              class="button block"
+              variant="outline-danger"
+              @click="signOut"
+              :disabled="loading"
+              >Sign Out
+            </BButton>
           </div>
         </div>
       </form>
@@ -143,40 +156,9 @@ async function signOut() {
   margin-bottom: 20px;
 }
 
-.avatarPlaceholder {
-  border: var(--custom-border);
-  border-radius: var(--custom-border-radius);
-  width: 35px;
-  height: 35px;
-  background-color: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .form-widget {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-.form-widget > .button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background-color: #444444;
-  text-transform: none !important;
-  transition: all 0.2s ease;
-}
-
-.form-widget .button:hover {
-  background-color: #2a2a2a;
-}
-
-.form-widget .button > .loader {
-  width: 17px;
-  animation: spin 1s linear infinite;
-  filter: invert(1);
 }
 </style>
