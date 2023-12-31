@@ -1,7 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { vBColorMode } from "bootstrap-vue-next";
 import { useUserStore } from "~/store/user";
 import { ref } from "vue";
+import type { FormData } from "~/types/user";
+
 const store = useUserStore();
 const user = ref(useSupabaseUser());
 const showRegisterModal = ref(false);
@@ -12,28 +14,24 @@ const close = () => {
   showRegisterModal.value = false;
   showModal.value = false;
 };
-let formData = ref({
-  email: "",
-  password: "",
-  type: "",
-});
-const updateForm = (data) => {
-  formData.value = {
-    email: data.value.email,
-    password: data.value.password,
-    type: data.value.type,
-  };
+
+let formData = ref<FormData>();
+const updateForm = (data: FormData | undefined) => {
+  formData.value = data;
 };
-const handleInput = async (formData) => {
-  if (formData.type === "login") {
-    const newFormData = {
-      email: formData.email,
-      password: formData.password,
-    };
-    console.log(newFormData);
-    await store.signIn(newFormData.email, newFormData.password);
-  } else if (formData.type === "register") {
-    await store.register(formData.email, formData.password);
+const handleInput = async (formData: FormData | undefined) => {
+  try {
+    if (formData?.type === "login") {
+      const newFormData = {
+        email: formData.email,
+        password: formData.password,
+      };
+      await store.signIn(newFormData.email, newFormData.password);
+    } else if (formData?.type === "register") {
+      await store.register(formData.email, formData.password);
+    }
+  } catch (error) {
+    alert((error as Error).message);
   }
 };
 </script>
@@ -59,14 +57,33 @@ const handleInput = async (formData) => {
             v-model="showModal"
             id="modal-center"
             centered
-            title="Login"
-            ok-title="Login"
+            :title="showLoginModal ? 'Login' : 'Register'"
+            :ok-title="showLoginModal ? 'Login' : 'Register'"
             @ok="handleInput(formData)"
             @close="close()"
             @cancel="close()"
           >
-            <LoginForm v-if="showLoginModal" @login="updateForm" />
-            <RegisterForm v-if="showRegisterModal" @register="updateForm" />
+            <div v-if="showLoginModal">
+              <LoginForm @login="updateForm" />
+              <div class="modalSwap">
+                <p>Don't have an account?</p>
+                <BButton
+                  @click="(showRegisterModal = true), (showLoginModal = false)"
+                >
+                  Register
+                </BButton>
+              </div>
+            </div>
+            <div v-if="showRegisterModal">
+              <RegisterForm @register="updateForm" />
+              <div class="modalSwap">
+                <p>Already have an account?</p>
+                <BButton
+                  @click="(showLoginModal = true), (showRegisterModal = false)"
+                  >Login</BButton
+                >
+              </div>
+            </div>
           </BModal>
         </div>
 
@@ -88,5 +105,13 @@ const handleInput = async (formData) => {
 <style scoped>
 .login-button {
   margin-left: 1rem;
+}
+
+.modalSwap {
+  display: flex;
+
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 </style>

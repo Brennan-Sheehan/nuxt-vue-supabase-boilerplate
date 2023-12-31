@@ -1,89 +1,50 @@
-<script setup>
-const supabase = useSupabaseClient();
+<script setup lang="ts">
+import { useUserStore } from "@/store/user";
+import { reactive } from "vue";
 
-const loading = ref(true);
-const username = ref("");
-const website = ref("");
-const avatar_path = ref("");
+const store = useUserStore();
+const { logout, updateProfile } = store;
+const user = computed(() => store.currentUserData);
 
-loading.value = true;
-const user = useSupabaseUser();
+const userProfile = reactive({
+  full_name: "",
+  username: "",
+  website: "",
+  avatar_url: "",
+});
 
-const { data } = await supabase
-  .from("profiles")
-  .select(`username, website, avatar_url`)
-  .eq("id", user.value.id)
-  .single();
-
-if (data) {
-  username.value = data.username;
-  website.value = data.website;
-  avatar_path.value = data.avatar_url;
+if (user.value) {
+  Object.assign(userProfile, user.value);
 }
 
-loading.value = false;
-
-async function updateProfile() {
+const handleUpdate = async () => {
   try {
-    loading.value = true;
-    const user = useSupabaseUser();
-
-    const updates = {
-      id: user.value.id,
-      username: username.value,
-      website: website.value,
-      avatar_url: avatar_path.value,
-      updated_at: new Date(),
-    };
-
-    const { error } = await supabase.from("profiles").upsert(updates, {
-      returning: "minimal", // Don't return the value after inserting
+    await updateProfile({
+      id: user.value!.id,
+      ...userProfile,
+      updated_at: new Date().toISOString().toLocaleString(),
     });
-    if (error) throw error;
   } catch (error) {
-    alert(error.message);
-  } finally {
-    loading.value = false;
+    alert((error as Error).message);
   }
-}
-
-async function signOut() {
-  try {
-    loading.value = true;
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    user.value = null;
-  } catch (error) {
-    alert(error.message);
-  } finally {
-    loading.value = false;
-  }
-}
+};
 </script>
 
 <template>
   <div class="container">
     <div class="profile">
-      <form class="form-widget" @submit.prevent="updateProfile">
+      <form class="form-widget">
         <div class="avatar">
           <Avatar
-            v-model:path="avatar_path"
+            v-model:path="userProfile.avatar_url"
             @upload="updateProfile"
             :size="10"
           />
         </div>
         <div class="form-element">
-          <label for="email">Email</label>
-          <BFormInput
-            v-model="user.email"
-            placeholder="Enter your email"
-            type="email"
-          />
-        </div>
-        <div class="form-element">
           <label for="username">Username</label>
           <BFormInput
-            v-model="username"
+            v-model="userProfile.username"
             placeholder="Enter your username"
             type="text"
           />
@@ -91,7 +52,7 @@ async function signOut() {
         <div class="form-element">
           <label for="website">Website</label>
           <BFormInput
-            v-model="website"
+            v-model="userProfile.website"
             placeholder="Enter your website"
             type="url"
           />
@@ -101,8 +62,7 @@ async function signOut() {
             <BButton
               class="button block"
               variant="outline-primary"
-              @click="updateProfile"
-              :disabled="loading"
+              @click="handleUpdate"
               >Update</BButton
             >
           </div>
@@ -111,8 +71,7 @@ async function signOut() {
             <BButton
               class="button block"
               variant="outline-danger"
-              @click="signOut"
-              :disabled="loading"
+              @click="logout"
               >Sign Out
             </BButton>
           </div>

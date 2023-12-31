@@ -1,7 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
+import type { FormData } from "~/types/user";
 const emit = defineEmits(["login"]);
-const formData = ref({
+const formData = ref<FormData>({
   email: "",
   password: "",
   type: "login",

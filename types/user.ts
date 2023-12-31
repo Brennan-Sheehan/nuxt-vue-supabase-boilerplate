@@ -1,8 +1,5 @@
-export interface User {
-  name: string;
+export interface FormData {
   email: string;
-  avatar: string;
-  token: string;
-  refreshToken: string;
-  expiresAt: number;
-}
+  password: string;
+  type: string;
+};

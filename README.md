@@ -1,6 +1,5 @@
-# Nuxt 3 Minimal Starter
+# Nuxt 3- Vue - Supabase Starter
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
 ## Setup
 
@@ -31,13 +30,26 @@ npm run build
 ```
 
 ## Supabase Config
+### Create Supabase Project
+1. Go to https://supabase.com/ and create a new supabase project.
+2. Once created you should be provided a set of keys. Take this keys and add them to an .env file inside your project like below:
 
-Obtain OAuth credentials for your Google Cloud project in the Credentials page of the console. When creating a new credential, choose Web application. In Authorized redirect URIs enter https://<project-id>.supabase.co/auth/v1/callback. This URL will be seen by your users, and you can customize it by configuring custom domains.
-Configure the OAuth Consent Screen. This information is shown to the user when giving consent to your app. Within Authorized domains make sure you add your Supabase project's domain <project-id>.supabase.co. Configure the non-sensitive scopes by making sure the following ones are selected: .../auth/userinfo.email, .../auth/userinfo.profile, openid. If you're selecting other sensitive scopes, your app may require additional verification. In those cases, it's best to use custom domains.
-Finally, add the client ID and secret from step 1 in the Google provider on the Supabase Dashboard.
+```code
+SUPABASE_URL= ""
+SUPABASE_KEY= ""
+```
+### Authentication
+Email and password is already setup to work out of the box. This is the documentation for google OAuth. The other social provider documentation can be found here: https://supabase.com/docs/guides/auth/social-login
+1. Obtain OAuth credentials for your Google Cloud project in the Credentials page of the console. When creating a new credential, choose Web application. In Authorized redirect URIs enter https://<project-id>.supabase.co/auth/v1/callback. This URL will be seen by your users, and you can customize it by configuring custom domains.
+2. Configure the OAuth Consent Screen. This information is shown to the user when giving consent to your app. Within Authorized domains make sure you add your Supabase project's domain <project-id>.supabase.co. Configure the non-sensitive scopes by making sure the following ones are selected: .../auth/userinfo.email, .../auth/userinfo.profile, openid. If you're selecting other sensitive scopes, your app may require additional verification. In those cases, it's best to use custom domains.
+3. Finally, add the client ID and secret from step 1 in the Google provider on the Supabase Dashboard.
 
-## Supabase Database Schema 
+### Database Schema 
+1. Go to the SQL Editor page in the Dashboard.
+2. Click User Management Starter.
+3. Click Run.
 
+Or tweak this sql to your desired schema
 ```sql
 -- Create a table for public "profiles"
 create table profiles (
