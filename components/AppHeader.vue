@@ -15,20 +15,24 @@ const close = () => {
   showModal.value = false;
 };
 
-let formData = ref<FormData>();
-const updateForm = (data: FormData | undefined) => {
-  formData.value = data;
+const formData = ref<FormData>({
+  email: "",
+  password: "",
+});
+let actionType = ref("");
+const updateForm = (data: any, type: string) => {
+  actionType.value = type;
+  if (data) {
+    formData.value.email = data.value.email;
+    formData.value.password = data.value.password;
+  }
 };
-const handleInput = async (formData: FormData | undefined) => {
+const handleInput = async () => {
   try {
-    if (formData?.type === "login") {
-      const newFormData = {
-        email: formData.email,
-        password: formData.password,
-      };
-      await store.signIn(newFormData.email, newFormData.password);
-    } else if (formData?.type === "register") {
-      await store.register(formData.email, formData.password);
+    if (actionType.value === "login" && formData.value) {
+      await store.signIn(formData.value.email, formData.value.password);
+    } else if (actionType.value === "register" && formData.value) {
+      await store.register(formData.value.email, formData.value.password);
     }
   } catch (error) {
     alert((error as Error).message);
@@ -42,62 +46,67 @@ const handleInput = async (formData: FormData | undefined) => {
     <BNavbarToggle target="nav-collapse" />
     <BCollapse id="nav-collapse" is-nav>
       <!-- Right aligned nav items -->
-      <BNavbarNav class="ms-auto mb-2 mb-lg-0">
-        <div v-if="!user">
-          <BButton @click="(showRegisterModal = true), (showModal = true)"
-            >Register</BButton
-          >
-          <BButton
-            class="login-button"
-            @click="(showLoginModal = true), (showModal = true)"
-            >Login</BButton
-          >
+      <ClientOnly>
+        <BNavbarNav class="ms-auto mb-2 mb-lg-0">
+          <div v-if="!user">
+            <BButton @click="(showRegisterModal = true), (showModal = true)"
+              >Register</BButton
+            >
+            <BButton
+              class="login-button"
+              @click="(showLoginModal = true), (showModal = true)"
+              >Login</BButton
+            >
 
-          <BModal
-            v-model="showModal"
-            id="modal-center"
-            centered
-            :title="showLoginModal ? 'Login' : 'Register'"
-            :ok-title="showLoginModal ? 'Login' : 'Register'"
-            @ok="handleInput(formData)"
-            @close="close()"
-            @cancel="close()"
-          >
-            <div v-if="showLoginModal">
-              <LoginForm @login="updateForm" />
-              <div class="modalSwap">
-                <p>Don't have an account?</p>
-                <BButton
-                  @click="(showRegisterModal = true), (showLoginModal = false)"
-                >
-                  Register
-                </BButton>
+            <BModal
+              v-model="showModal"
+              id="modal-center"
+              centered
+              :title="showLoginModal ? 'Login' : 'Register'"
+              :ok-title="showLoginModal ? 'Login' : 'Register'"
+              @ok="handleInput"
+              @close="close()"
+              @cancel="close()"
+            >
+              <div v-if="showLoginModal">
+                <UserForm @handleUser="updateForm" type="login" />
+                <div class="modalSwap">
+                  <p>Don't have an account?</p>
+                  <BButton
+                    @click="
+                      (showRegisterModal = true), (showLoginModal = false)
+                    "
+                  >
+                    Register
+                  </BButton>
+                </div>
               </div>
-            </div>
-            <div v-if="showRegisterModal">
-              <RegisterForm @register="updateForm" />
-              <div class="modalSwap">
-                <p>Already have an account?</p>
-                <BButton
-                  @click="(showLoginModal = true), (showRegisterModal = false)"
-                  >Login</BButton
-                >
+              <div v-if="showRegisterModal">
+                <UserForm @handleUser="updateForm" type="register" />
+                <div class="modalSwap">
+                  <p>Already have an account?</p>
+                  <BButton
+                    @click="
+                      (showLoginModal = true), (showRegisterModal = false)
+                    "
+                    >Login</BButton
+                  >
+                </div>
               </div>
-            </div>
-          </BModal>
-        </div>
+            </BModal>
+          </div>
 
-        <BNavItemDropdown right v-if="user">
-          <!-- Using 'button-content' slot -->
-          <template #button-content>
-            <em>User</em>
-          </template>
-          <BDropdownItem href="#">
-            <NuxtLink :to="`/profile/${user.id}`">Profile</NuxtLink>
-          </BDropdownItem>
-          <BDropdownItem @click="store.logout()">Sign Out</BDropdownItem>
-        </BNavItemDropdown>
-      </BNavbarNav>
+          <BNavItemDropdown right v-if="user">
+            <template #button-content>
+              <em>User</em>
+            </template>
+            <BDropdownItem>
+              <NuxtLink :to="`/profile/${user.id}`">Profile</NuxtLink>
+            </BDropdownItem>
+            <BDropdownItem @click="store.logout()">Sign Out</BDropdownItem>
+          </BNavItemDropdown>
+        </BNavbarNav>
+      </ClientOnly>
     </BCollapse>
   </BNavbar>
 </template>

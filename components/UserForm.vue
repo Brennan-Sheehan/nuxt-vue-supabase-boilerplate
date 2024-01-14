@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { FormData } from "~/types/user";
-const emit = defineEmits(["register"]);
+const emit = defineEmits(["handleUser"]);
+const props = defineProps({
+  type: String,
+});
 const formData = ref<FormData>({
   email: "",
   password: "",
-  type: "register",
 });
 const handleChange = () => {
   if (formData.value.email && formData.value.password) {
-    // Emit the "login" event only when both fields have data
-    emit("register", formData);
+    emit("handleUser", formData, props.type);
   }
 };
 const onReset = () => {

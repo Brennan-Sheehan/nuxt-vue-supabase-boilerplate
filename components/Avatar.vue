@@ -1,65 +1,41 @@
-<script setup>
+<script setup lang="ts">
+import { useUserStore } from "~/store/user";
 const props = defineProps(["path"]);
-const { path, size } = toRefs(props);
 
 const emit = defineEmits(["update:path", "upload"]);
 
 const supabase = useSupabaseClient();
-
-const uploading = ref(false);
+const userStore = useUserStore();
 const src = ref("");
-const files = ref();
+const files = ref<File>();
 
 const downloadImage = async () => {
   try {
     const { data, error } = await supabase.storage
       .from("avatars")
-      .download(path.value);
+      .download(props.path);
     if (error) throw error;
     src.value = URL.createObjectURL(data);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error downloading image: ", error.message);
   }
 };
 
 const uploadAvatar = async () => {
-  console.log(files.value);
-  try {
-    uploading.value = true;
-
-    if (!files.value || files.value.length === 0) {
-      throw new Error("You must select an image to upload.");
-    }
-
-    const file = files.value;
-    console.log(file);
-    const fileExt = file.name.split(".").pop();
-    console.log(fileExt);
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, file);
-
-    if (uploadError) throw uploadError;
-
-    emit("update:path", filePath);
-    emit("upload");
-  } catch (error) {
-    alert(error.message);
-  } finally {
-    uploading.value = false;
+  if (!files.value) {
+    throw new Error("You must select an image to upload.");
   }
+
+  const file = files.value;
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Math.random()}.${fileExt}`;
+  const filePath = `${fileName}`;
+  await userStore.uploadAvatar(files.value, filePath);
+  emit("update:path", filePath);
 };
-
-downloadImage();
-
-watch(path, () => {
-  if (path.value) {
-    downloadImage();
-  }
-});
+if (props.path) {
+  downloadImage();
+}
 </script>
 
 <template>
@@ -71,11 +47,6 @@ watch(path, () => {
       :src="src"
       class="avatar"
       size="10rem"
-    />
-    <div
-      v-else
-      class="avatar no-image"
-      :style="{ height: size, width: size }"
     />
 
     <div class="avatar-upload">

@@ -9,10 +9,8 @@
       style="max-width: 40rem"
     >
       <BCardText>
-        <p>
-          Authentication template with Supabase Auth and Database. Uses
-          Bootstrap for styling and Nuxt3 for the framework.
-        </p>
+        Authentication template with Supabase Auth and Database. Uses Bootstrap
+        for styling and Nuxt3 for the framework.
       </BCardText>
     </BCard>
   </div>

@@ -35,11 +35,7 @@ const handleUpdate = async () => {
     <div class="profile">
       <form class="form-widget">
         <div class="avatar">
-          <Avatar
-            v-model:path="userProfile.avatar_url"
-            @upload="updateProfile"
-            :size="10"
-          />
+          <Avatar v-model:path="userProfile.avatar_url" :size="10" />
         </div>
         <div class="form-element">
           <label for="username">Username</label>
