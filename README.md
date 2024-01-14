@@ -1,4 +1,4 @@
-# Nuxt 3- Vue - Supabase Starter
+# Nuxt 3 - Vue - Supabase Starter
 
 
 ## Setup
